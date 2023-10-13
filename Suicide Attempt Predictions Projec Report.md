@@ -42,7 +42,7 @@
 
 
 
-## <a name="Data Acquisition and Description"></a>3.1. Data Acquisition and Description
+## <a name="data-acquisition-and-description"></a>3.1. Data Acquisition and Description
 
 
 #### Basic Information
@@ -87,7 +87,7 @@
 | mrs    | String       | Yes  | Types of prescriptions in specific periods     | -12, -9, -6, -3, -1, +1, +3, +6, +9, +12 | Missing data    | None              | By prescription type     |
 
 
-## <a name="Data Pre-processing"></a>3.1. Data Pre-processing
+## <a name="data-pre-processing"></a>3.1. Data Pre-processing
 
 ## <a name="handling-true-zeros"></a>3.2.1 Handling True Zeros
 
