@@ -42,11 +42,10 @@
 
 
 
-## <a name="comprehensive-understanding-of-dataset-features"></a>3.1.1 Comprehensive Understanding of Dataset Features
+## <a name="Data Acquisition and Description"></a>3.1. Data Acquisition and Description
 
-### <a name="data-structure-tables"></a>3.1.1.1 Data Structure Tables
 
-#### <a name="basic-information"></a>3.1.1.1.1 Basic Information
+#### Basic Information
 
 | Prefix            | Data Type   | Null | Description                           | Time Periods List | Data Problems | Preferred Scaling | Preferred Grouping     |
 |-------------------|-------------|------|---------------------------------------|-------------------|---------------|-------------------|------------------------|
@@ -64,7 +63,7 @@
 | zman_bein_ishpuz  | Numeric     | Yes  | Time between family care instances    | N/A               | Missing data  | Standardization   | By time                |
 
 
-#### <a name="time-based-features-multiple-prefixes"></a>3.1.1.1.2 Time-Based Features (Multiple Prefixes)
+#### Time-Based Features (Multiple Prefixes)
 
 | Prefix      | Data Type    | Null | Description                                               | Time Periods List         | Data Problems | Preferred Scaling | Preferred Grouping     |
 |-------------|--------------|------|-----------------------------------------------------------|---------------------------|---------------|-------------------|------------------------|
@@ -74,19 +73,21 @@
 | bkrcnt_emg  | Zero-Inflated| Yes  | Count of bkrcnt_emg type appointments in specific periods  | -12, -9, -6, -3, -1, +1, +3, +6, +9, +12  | Zero-inflated  | Log transformation | By type of appointment |
 | missbkr_cnt | Zero-Inflated| Yes  | Count of missing type appointments in specific periods     | -12, -9, -6, -3, -1, +1, +3, +6, +9, +12  | Zero-inflated  | Log transformation | By type of appointment |
 
-#### <a name="medical-diagnoses-avh-prefix"></a>3.1.1.1.3 Medical Diagnoses (avh prefix)
+#### Medical Diagnoses (avh prefix)
 
 | Prefix | Data Type | Null | Description                                     | Time Periods List         | Data Problems | Preferred Scaling | Preferred Grouping |
 |--------|-----------|------|-------------------------------------------------|---------------------------|---------------|-------------------|--------------------|
 | avh    | String    | Yes  | Medical diagnosis in specific periods           | -12, -9, -6, -3, -1, +1, +3, +6, +9, +12 | Missing data    | None              | By diagnosis type  |
 
-#### <a name="types-of-prescriptions-mrs-prefix"></a>3.1.1.1.4 Types of Prescriptions (mrs prefix)
+#### Types of Prescriptions (mrs prefix)
 
 
 | Prefix | Data Type    | Null | Description                                    | Time Periods List         | Data Problems | Preferred Scaling | Preferred Grouping       |
 |--------|--------------|------|------------------------------------------------|---------------------------|---------------|-------------------|--------------------------|
 | mrs    | String       | Yes  | Types of prescriptions in specific periods     | -12, -9, -6, -3, -1, +1, +3, +6, +9, +12 | Missing data    | None              | By prescription type     |
 
+
+## <a name="Data Pre-processing"></a>3.1. Data Pre-processing
 
 ## <a name="handling-true-zeros"></a>3.2.1 Handling True Zeros
 
