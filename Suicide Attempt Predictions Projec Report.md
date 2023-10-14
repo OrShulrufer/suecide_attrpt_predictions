@@ -15,6 +15,8 @@
     - 3.2 *[Data Pre-processing](#data-pre-processing)*
         - 3.2.1 *[Handling True Zeros](#handling-true-zeros)*
         - 3.2.2 *[Addressing Non-Normal Distribution](#addressing-non-normal-distribution)*
+        - 3.2.3 *[Dynamic and Automatic Data Scaling](#dynamic-automatic-data-scaling)*
+        - 3.2.4 *[Solver and Penalty Selection in Logistic Regression](#solver-and-penalty-selection-in-logistic-regression)*
     - 3.3 *[Model Development](#model-development)*
         - 3.3.1 *[Function: create_shifted_period_datasets](#create-shifted-period-datasets)*
         - 3.3.2 *[Model Building Strategy](#model-building-strategy)*
@@ -87,68 +89,98 @@
 | mrs    | String       | Yes  | Types of prescriptions in specific periods     | -12, -9, -6, -3, -1, +1, +3, +6, +9, +12 | Missing data    | None              | By prescription type     |
 
 
-## <a name="data-pre-processing"></a>3.1. Data Pre-processing
 
-## <a name="handling-true-zeros"></a>3.2.1 Handling True Zeros
+## <a name="dynamic-automatic-data-scaling"></a>3.2.3 Dynamic and Automatic Data Scaling
 
 ### Introduction
 
-In our dataset, zeros are not placeholders or missing values; they are "true zeros," indicating the absence of a feature or condition. These zeros are particularly prevalent in time-based features like `bkrcnt`, `bkrcnt_mish`, and `bkrcnt_mik`, where a zero denotes no appointments of a certain type during the specific period. Handling these zeros correctly is crucial for the integrity and interpretability of our predictive models.
+Feature scaling is an essential step in the preprocessing pipeline, particularly for datasets with features that span multiple scales. In our case, we have various types of features, including counts of doctor appointments and binary indicators. These features are not on the same scale, making scaling crucial. We introduce a dynamic and automatic scaling function that adapts to the characteristics of the data
 
-### Methods for Handling True Zeros
+#### Automatic Selection of Scaling Method
 
-#### Zero-Inflation Techniques
+Our function `scale_columns` in `data_preeprocess_functions.py` dynamically selects the best initial scaling method. It considers the feature's skewness and range to decide between log scaling, Min-Max scaling, and Quantile scaling.
 
-Given that our dataset is zero-inflated, one approach is to use zero-inflated models. These models have two parts: one part models the count variable using Poisson or Negative Binomial distribution, and the other part models the excess zeros. This approach is implemented in the `data_preeprocess_functions.py` file.
+#### Multiple Steps of Scaling
 
-#### Log Transformation
+The function performs a final Min-Max scaling to ensure all values fall within the 0 to 1 range. This two-step process allows for more robust feature normalization.
 
-Another approach to manage the skewness introduced by true zeros is log transformation. However, since the log of zero is undefined, we would first replace zeros with a very small positive number before applying the transformation. This approach is also implemented in the `data_preeprocess_functions.py` file.
+#### Handling True Zeros
+
+Our dataset contains "true zeros," and the function respects this by leaving zeros untouched during the scaling process. This maintains the integrity and interpretability of our predictive models.
 
 ### Code Snippets
 
-#### Zero-Inflation Technique
-
 ```python
 # Code from data_preeprocess_functions.py
-def log_transform(df, column):
-    df[column] = df[column].apply(lambda x: np.log(x if x > 0 else 1e-9))
-```
+def scale_columns(df, initial_method='auto', fillna_null=0, debug=False):
+    scaler_minmax = MinMaxScaler()
+    scaler_quantile = QuantileTransformer()
+    
+    scaled_df = df.fillna(fillna_null)
+    
+    for col in scaled_df.columns:
+        if debug:
+            print(f"Scaling column: {col}")
+        
+        scaled_df[col].fillna(fillna_null, inplace=True)
+        
+        if initial_method == 'auto':
+            if scaled_df[col].skew() > 1:
+                scaled_df[col] = np.log1p(scaled_df[col])
+                
+            if scaled_df[col].max() - scaled_df[col].min() > 10:
+                scaled_df[col] = scaler_quantile.fit_transform(scaled_df[[col]])
+            else:
+                scaled_df[col] = scaler_minmax.fit_transform(scaled_df[[col]])
+        elif initial_method == 'log':
+            scaled_df[col] = np.log1p(scaled_df[col])
+        elif initial_method == 'minmax':
+            scaled_df[col] = scaler_minmax.fit_transform(scaled_df[[col]])
+        elif initial_method == 'quantile':
+            scaled_df[col] = scaler_quantile.fit_transform(scaled_df[[col]])
+            
+        scaled_df[col] = scaler_minmax.fit_transform(scaled_df[[col]])
+
+    return scaled_df
+
 
 #### Conclusion
 
-Handling true zeros appropriately ensures that our predictive models will be both accurate and interpretable. By leveraging specialized techniques for zero-inflation and transformations, we maintain the integrity of our dataset.
+This approach to data scaling is both dynamic and automatic, adapting to the specific characteristics of each feature while respecting the true zeros in our dataset. This ensures that our predictive models will be both accurate and interpretable.
 
-### <a name="addressing-non-normal-distribution"></a>3.2.2 Addressing Non-Normal Distribution
 
-#### Introduction
+### 3.2.4 Algorithmic and Statistical Methodologies and Parameters
 
-In machine learning, the assumption of normality for numerical variables can often simplify modeling techniques and increase the predictive power of a model. However, in real-world scenarios, especially in healthcare data like ours, variables often do not follow this distribution. Our dataset has features that are zero-inflated and skewed, challenging the assumptions of many statistical techniques and machine learning models.
+#### Logistic Regression Solvers
 
-#### Importance of Normal Distribution
+| Solver        | Explanation                                                  | Pros                                        | Cons                                |
+|---------------|--------------------------------------------------------------|----------------------------------------------|-------------------------------------|
+| `newton-cg`   | Newton's method for optimization                             | Good for large datasets, Robust              | Slower for small datasets           |
+| `lbfgs`       | Limited-memory Broyden-Fletcher-Goldfarb-Shanno algorithm    | Efficient for small datasets                 | Less robust for ill-conditioned Hessian |
+| `liblinear`   | Library for Large Linear Classification                      | Good for high dimensional data               | Not good for large datasets         |
+| `sag`         | Stochastic Average Gradient descent                          | Fast for large datasets                      | Sensitive to feature scaling        |
+| `saga`        | Extension of `sag` that supports `l1` penalty                | Supports more penalties, Fast for large datasets | Sensitive to feature scaling  |
 
-Non-normal distribution in the predictors can introduce bias and reduce the reliability and interpretability of machine learning models. For instance, many parametric models like linear regression assume that the errors are normally distributed, an assumption that can be violated if the predictors themselves are not normally distributed.
+#### Penalties in Logistic Regression
 
-#### Identification Methods
+| Penalty      | Explanation                                                   | Pros                                           | Cons                              |
+|--------------|---------------------------------------------------------------|-------------------------------------------------|-----------------------------------|
+| `l1`         | L1 norm of the parameters                                     | Feature selection                               | Not smooth                        |
+| `l2`         | L2 norm of the parameters                                     | Smooth solution                                 | No feature selection              |
+| `elasticnet` | Combination of L1 and L2                                      | Feature selection and smoothness                | Requires tuning of l1_ratio      |
+| `none`       | No penalty                                                    | Simple model                                    | Risk of overfitting               |
 
-Before applying any transformations, it's crucial to identify which variables do not follow a normal distribution. Techniques such as histogram plotting, Shapiro-Wilk test, or D’Agostino and Pearson’s Test can be employed to statistically measure the normality of the features.
+#### Logistic Regression Solver-Penalty Combinations
 
-#### Techniques Used for Transformation
+The solver and penalty combinations in Logistic Regression have to be compatible. Here are the valid combinations:
 
-To address non-normality, several transformation techniques can be used, depending on the type and extent of skewness:
+- `newton-cg`: Supports `l2`, `none`
+- `lbfgs`: Supports `l2`, `none`
+- `liblinear`: Supports `l1`, `l2`
+- `sag`: Supports `l2`, `none`
+- `saga`: Supports `l1`, `l2`, `elasticnet`, `none`
 
-1. **Log Transformation**: Useful for right-skewed data.
-2. **Square/Cube Root Transformation**: Helpful for less skewed data.
-3. **Box-Cox Transformation**: A more general form that chooses the best power transformation of the data that reduces skewness.
-4. **Min-Max Scaling**: Particularly useful for features that have different ranges.
 
-#### Implementation in Code
-
-In our project, we employed log-transformation and Min-Max scaling after identifying the skewness in the variables. These transformations were incorporated into the pre-processing pipeline to ensure that every feature gets appropriately transformed before model training.
-
-#### Conclusion
-
-Addressing the non-normal distribution is critical for the predictive power and interpretability of our models. By identifying and transforming skewed features, we make our models more robust and reliable, fulfilling the underlying assumptions that many algorithms hold.
 
 ## <a name="model-development"></a>3.3 Model Development
 
@@ -326,6 +358,7 @@ XGBoost not only delivered high performance but also offers scalability and hand
 The final model selection was a result of rigorous testing and validation. It not only meets the project objectives but also stands robust against various challenges discussed in the previous sections.
 
 
+
 ### <a name="model-deployment"></a>3.3.7 Model Deployment
 
 The model deployment stage is a critical juncture where the developed model transitions from a research and development setting into real-world applications. Given the life-critical nature of the model, which aims to predict the suicide attempt risk among recently discharged patients, the deployment process is meticulously planned and executed. The model is embedded within an ETL (Extract, Transform, Load) process that is scheduled for daily runs, thus ensuring that it is continuously updated with fresh data. The ETL process itself is a blend of SQL for data extraction, Python for transformation and analytics, and SAS for detailed reporting.
@@ -474,6 +507,35 @@ The deployment phase is the culmination of all the prior development, testing, a
 8. **User Training**: Proper training will be provided to healthcare providers and system administrators to ensure effective utilization of the model’s predictive capabilities.
 
 By systematically addressing these elements, we ensure that the deployed model is not just scientifically rigorous but also practically robust, scalable, and maintainable, fulfilling its critical role in healthcare decision-making.
+
+
+## <a name="setting-the-significance-level"></a>3.4.3 Setting the Significance Level (\( \alpha \))
+
+### Introduction
+
+The significance level (\( \alpha \)) is a crucial parameter in hypothesis testing, including the Wald test. It serves as a threshold for determining statistical significance and thus plays an important role in feature selection and model evaluation.
+
+### Pros and Cons of Different \( \alpha \) Levels
+
+| \( \alpha \) Level | Pros                                               | Cons                                                |
+|--------------------|----------------------------------------------------|-----------------------------------------------------|
+| 0.01               | Reduces Type I errors (false positives)            | Increases Type II errors (false negatives)          |
+| 0.05               | Balanced approach to Type I and Type II errors     | May still include some irrelevant features          |
+| 0.10               | Reduces Type II errors                             | Increases Type I errors                             |
+
+### Explanation
+
+- **\( \alpha = 0.01 \)**: Very strict. You're making it hard to reject the null hypothesis, so you're less likely to make a Type I error but more likely to make a Type II error.
+  
+- **\( \alpha = 0.05 \)**: Standard practice in many fields. It's a balanced approach but still has the risk of including irrelevant features (Type I error) or missing out on important ones (Type II error).
+  
+- **\( \alpha = 0.10 \)**: More lenient. You're making it easier to reject the null hypothesis, increasing the risk of Type I errors but decreasing the risk of Type II errors.
+
+### For Your Goals
+
+Given the focus on building the best predictive model, \( \alpha = 0.05 \) is often a reasonable default. However, it may be beneficial to experiment with different \( \alpha \) levels and evaluate their impact on the model's predictive performance.
+
+
 
 ## <a name="results-and-discussion"></a>4. Results and Discussion
 
