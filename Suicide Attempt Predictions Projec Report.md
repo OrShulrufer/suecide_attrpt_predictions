@@ -1,6 +1,8 @@
-# Suicide Attempt Predictions
+# <span style="color: red;">Suicide Attempt Predictions</span>
+---
 
-## Table of Contents
+## <span style="color: green;">Table of Contents</span>
+---
 
 1. **[Introduction](#introduction)**
     - 1.1 *[Background and Motivation](#background-and-motivation)*
@@ -44,10 +46,12 @@
 
 
 
-## <a name="data-acquisition-and-description"></a>3.1. Data Acquisition and Description
+## <span style="color: green;"><a name="data-acquisition-and-description"></a>3.1. Data Acquisition and Description</span>
+---
 
 
-#### Basic Information
+#### <span style="color: purple;">Basic Information</span>
+---
 
 | Prefix            | Data Type   | Null | Description                           | Time Periods List | Data Problems | Preferred Scaling | Preferred Grouping     |
 |-------------------|-------------|------|---------------------------------------|-------------------|---------------|-------------------|------------------------|
@@ -65,7 +69,8 @@
 | zman_bein_ishpuz  | Numeric     | Yes  | Time between family care instances    | N/A               | Missing data  | Standardization   | By time                |
 
 
-#### Time-Based Features (Multiple Prefixes)
+#### <span style="color: purple;">Time-Based Features (Multiple Prefixes)</span>
+---
 
 | Prefix      | Data Type    | Null | Description                                               | Time Periods List         | Data Problems | Preferred Scaling | Preferred Grouping     |
 |-------------|--------------|------|-----------------------------------------------------------|---------------------------|---------------|-------------------|------------------------|
@@ -75,13 +80,15 @@
 | bkrcnt_emg  | Zero-Inflated| Yes  | Count of bkrcnt_emg type appointments in specific periods  | -12, -9, -6, -3, -1, +1, +3, +6, +9, +12  | Zero-inflated  | Log transformation | By type of appointment |
 | missbkr_cnt | Zero-Inflated| Yes  | Count of missing type appointments in specific periods     | -12, -9, -6, -3, -1, +1, +3, +6, +9, +12  | Zero-inflated  | Log transformation | By type of appointment |
 
-#### Medical Diagnoses (avh prefix)
+#### <span style="color: purple;">Medical Diagnoses (avh prefix)</span>
+---
 
 | Prefix | Data Type | Null | Description                                     | Time Periods List         | Data Problems | Preferred Scaling | Preferred Grouping |
 |--------|-----------|------|-------------------------------------------------|---------------------------|---------------|-------------------|--------------------|
 | avh    | String    | Yes  | Medical diagnosis in specific periods           | -12, -9, -6, -3, -1, +1, +3, +6, +9, +12 | Missing data    | None              | By diagnosis type  |
 
-#### Types of Prescriptions (mrs prefix)
+#### <span style="color: purple;">Types of Prescriptions (mrs prefix)</span>
+---
 
 
 | Prefix | Data Type    | Null | Description                                    | Time Periods List         | Data Problems | Preferred Scaling | Preferred Grouping       |
@@ -90,28 +97,35 @@
 
 
 
-## <a name="dynamic-automatic-data-scaling"></a>3.2.3 Dynamic and Automatic Data Scaling
+## <span style="color: green;"><a name="dynamic-automatic-data-scaling"></a>3.2.3 Dynamic and Automatic Data Scaling</span>
+---
 
-### Introduction
+### <span style="color: blue;">Introduction</span>
+---
 
 Feature scaling is an essential step in the preprocessing pipeline, particularly for datasets with features that span multiple scales. In our case, we have various types of features, including counts of doctor appointments and binary indicators. These features are not on the same scale, making scaling crucial. We introduce a dynamic and automatic scaling function that adapts to the characteristics of the data
 
-#### Automatic Selection of Scaling Method
+#### <span style="color: purple;">Automatic Selection of Scaling Method</span>
+---
 
 Our function `scale_columns` in `data_preeprocess_functions.py` dynamically selects the best initial scaling method. It considers the feature's skewness and range to decide between log scaling, Min-Max scaling, and Quantile scaling.
 
-#### Multiple Steps of Scaling
+#### <span style="color: purple;">Multiple Steps of Scaling</span>
+---
 
 The function performs a final Min-Max scaling to ensure all values fall within the 0 to 1 range. This two-step process allows for more robust feature normalization.
 
-#### Handling True Zeros
+#### <span style="color: purple;">Handling True Zeros</span>
+---
 
 Our dataset contains "true zeros," and the function respects this by leaving zeros untouched during the scaling process. This maintains the integrity and interpretability of our predictive models.
 
-### Code Snippets
+### <span style="color: blue;">Code Snippets</span>
+---
 
 ```python
-# Code from data_preeprocess_functions.py
+# <span style="color: red;">Code from data_preeprocess_functions.py</span>
+---
 def scale_columns(df, initial_method='auto', fillna_null=0, debug=False):
     scaler_minmax = MinMaxScaler()
     scaler_quantile = QuantileTransformer()
@@ -144,14 +158,17 @@ def scale_columns(df, initial_method='auto', fillna_null=0, debug=False):
     return scaled_df
 
 
-#### Conclusion
+#### <span style="color: purple;">Conclusion</span>
+---
 
 This approach to data scaling is both dynamic and automatic, adapting to the specific characteristics of each feature while respecting the true zeros in our dataset. This ensures that our predictive models will be both accurate and interpretable.
 
 
-### 3.2.4 Algorithmic and Statistical Methodologies and Parameters
+### <span style="color: blue;">3.2.4 Algorithmic and Statistical Methodologies and Parameters</span>
+---
 
-#### Logistic Regression Solvers
+#### <span style="color: purple;">Logistic Regression Solvers</span>
+---
 
 | Solver        | Explanation                                                  | Pros                                        | Cons                                |
 |---------------|--------------------------------------------------------------|----------------------------------------------|-------------------------------------|
@@ -161,7 +178,8 @@ This approach to data scaling is both dynamic and automatic, adapting to the spe
 | `sag`         | Stochastic Average Gradient descent                          | Fast for large datasets                      | Sensitive to feature scaling        |
 | `saga`        | Extension of `sag` that supports `l1` penalty                | Supports more penalties, Fast for large datasets | Sensitive to feature scaling  |
 
-#### Penalties in Logistic Regression
+#### <span style="color: purple;">Penalties in Logistic Regression</span>
+---
 
 | Penalty      | Explanation                                                   | Pros                                           | Cons                              |
 |--------------|---------------------------------------------------------------|-------------------------------------------------|-----------------------------------|
@@ -170,7 +188,8 @@ This approach to data scaling is both dynamic and automatic, adapting to the spe
 | `elasticnet` | Combination of L1 and L2                                      | Feature selection and smoothness                | Requires tuning of l1_ratio      |
 | `none`       | No penalty                                                    | Simple model                                    | Risk of overfitting               |
 
-#### Logistic Regression Solver-Penalty Combinations
+#### <span style="color: purple;">Logistic Regression Solver-Penalty Combinations</span>
+---
 
 The solver and penalty combinations in Logistic Regression have to be compatible. Here are the valid combinations:
 
@@ -182,15 +201,19 @@ The solver and penalty combinations in Logistic Regression have to be compatible
 
 
 
-## <a name="model-development"></a>3.3 Model Development
+## <span style="color: green;"><a name="model-development"></a>3.3 Model Development</span>
+---
 
-### <a name="create-shifted-period-datasets"></a>3.3.1 Function: create_shifted_period_datasets
+### <span style="color: blue;"><a name="create-shifted-period-datasets"></a>3.3.1 Function: create_shifted_period_datasets</span>
+---
 
-#### Objective
+#### <span style="color: purple;">Objective</span>
+---
 
 The function `create_shifted_period_datasets()` is tailored to assemble datasets that facilitate time-based predictive modeling of suicide attempts. The goal is to generate a series of datasets where each is designed to predict suicide attempts for a specific next time period after hospitalization, utilizing all available data up to (but not including) that period.
 
-#### Parameters
+#### <span style="color: purple;">Parameters</span>
+---
 
 - `df`: The complete dataframe with all features and target variables.
 - `df_before_sorted`: Dataframe containing 'before hospitalization' features.
@@ -199,7 +222,8 @@ The function `create_shifted_period_datasets()` is tailored to assemble datasets
 - `target_keyword`: String used to identify target columns.
 - `debug`: Boolean flag for debugging purposes.
 
-#### Algorithm Explained
+#### <span style="color: purple;">Algorithm Explained</span>
+---
 
 1. **Initialize Dictionary**: An empty dictionary `period_datasets` is created to store feature and target datasets for each time period.
    
@@ -217,25 +241,31 @@ The function `create_shifted_period_datasets()` is tailored to assemble datasets
   
 5. **Data Storage**: Each feature and target pair is stored in `period_datasets` indexed by the time range they are intended to predict.
 
-#### Conclusion
+#### <span style="color: purple;">Conclusion</span>
+---
 
 The function `create_shifted_period_datasets()` serves as a foundational building block for model development in this project. It prepares the stage for creating predictive models by organizing the data into time-structured datasets, thereby enabling us to make specific, period-wise suicide attempt predictions starting from the zero point (hospitalization).
 
-### <a name="model-building-strategy"></a>3.3.2 Model Building Strategy
+### <span style="color: blue;"><a name="model-building-strategy"></a>3.3.2 Model Building Strategy</span>
+---
 
-#### Objective
+#### <span style="color: purple;">Objective</span>
+---
 
 The objective under this subsection is to outline the overall strategy employed in the building of predictive models for each period. These models aim to predict suicide attempts for each next time period after hospitalization, starting from the zero point.
 
-#### Single Pipeline Architecture
+#### <span style="color: purple;">Single Pipeline Architecture</span>
+---
 
 Contrary to having separate pipelines for 'before' and 'after' hospitalization, the project adopts a single pipeline architecture for every next period's predictions. This approach is optimized to use all available information up until the period in question but does not include information from the target period itself.
 
-#### Model Choice and Evaluation Metrics
+#### <span style="color: purple;">Model Choice and Evaluation Metrics</span>
+---
 
 Given the zero-inflated nature of the dataset and the criticality of the problem being addressed, specialized classifiers are chosen. Evaluation metrics are selected to give a balanced view of the model's performance, taking into consideration both the class imbalance and the zero-inflated nature of the target variable.
 
-#### Strategy Steps
+#### <span style="color: purple;">Strategy Steps</span>
+---
 
 1. **Data Preparation**: Utilize the datasets generated by `create_shifted_period_datasets()`.
    
@@ -247,29 +277,36 @@ Given the zero-inflated nature of the dataset and the criticality of the problem
   
 5. **Evaluation**: Use evaluation metrics such as F1-score, Precision, Recall, and AUC-ROC to assess the model's performance.
 
-#### Conclusion
+#### <span style="color: purple;">Conclusion</span>
+---
 
 This model-building strategy serves as a systematic roadmap for creating effective predictive models for each period, from the point of hospitalization onward. By consolidating all available information and applying specialized techniques, we aim to build models that are both accurate and interpretable, while addressing the unique challenges posed by the dataset's zero-inflated nature.
 
-### <a name="incorporation-of-evaluation-techniques"></a>3.3.3 Incorporation of Evaluation Techniques
+### <span style="color: blue;"><a name="incorporation-of-evaluation-techniques"></a>3.3.3 Incorporation of Evaluation Techniques</span>
+---
 
-#### Objective
+#### <span style="color: purple;">Objective</span>
+---
 
 The purpose of this subsection is to elaborate on the evaluation techniques employed in assessing the predictive models. These techniques are not limited to traditional evaluation metrics but extend to include statistical tests and variance checks.
 
-#### P-Value
+#### <span style="color: purple;">P-Value</span>
+---
 
 The P-value is employed to test the null hypothesis that the model parameters have no effect. A low P-value (< 0.05) indicates that you can reject the null hypothesis. In other words, a predictor that has a low P-value is likely to be a meaningful addition to your model.
 
-#### Wald Test
+#### <span style="color: purple;">Wald Test</span>
+---
 
 The Wald test is used to understand the impact of each predictor in explaining the variation in the dependent variable. A high Wald statistic value compared to a chi-square distribution leads to the rejection of the null hypothesis, thereby marking the predictor as significant.
 
-#### Variance Logic
+#### <span style="color: purple;">Variance Logic</span>
+---
 
 Variance in the predicted probabilities is also assessed. A model with low variance in predicted probabilities may be too rigid and not adaptive to the complexities in the dataset. Thus, variance checks act as a measure of model flexibility.
 
-#### Combined Evaluation
+#### <span style="color: purple;">Combined Evaluation</span>
+---
 
 The models are evaluated based on a combination of:
 
@@ -278,92 +315,115 @@ The models are evaluated based on a combination of:
 3. Wald Test for parameter significance.
 4. Variance in predicted probabilities for model flexibility.
 
-#### Conclusion
+#### <span style="color: purple;">Conclusion</span>
+---
 
 By incorporating a variety of evaluation techniques, including statistical tests like the P-value and Wald Test, along with variance logic, this project aims to provide a holistic view of model performance. This multi-faceted evaluation ensures that the models are not only accurate but also statistically significant and flexible to the dataset's complexities.
 
 
-### <a name="model-optimization-strategies"></a>3.3.4 Model Optimization Strategies
+### <span style="color: blue;"><a name="model-optimization-strategies"></a>3.3.4 Model Optimization Strategies</span>
+---
 
-#### Objective
+#### <span style="color: purple;">Objective</span>
+---
 
 The objective of this subsection is to outline the strategies employed for optimizing the predictive models after their initial evaluation. This includes parameter tuning, feature selection, and ensemble methods.
 
-#### Hyperparameter Tuning
+#### <span style="color: purple;">Hyperparameter Tuning</span>
+---
 
 Hyperparameter tuning aims to find the optimal set of hyperparameters for the model. Techniques such as grid search and random search are used for this purpose.
 
-#### Feature Importance
+#### <span style="color: purple;">Feature Importance</span>
+---
 
 Based on the initial model evaluations, the features contributing the least to the predictive power of the model are identified. These features may be dropped or transformed for subsequent iterations.
 
-#### Ensemble Methods
+#### <span style="color: purple;">Ensemble Methods</span>
+---
 
 Models such as Random Forest and Gradient Boosting are inherently ensemble methods. However, additional ensemble techniques like stacking may be employed to improve the performance of simpler models.
 
-#### Dynamic Optimization
+#### <span style="color: purple;">Dynamic Optimization</span>
+---
 
 Given that this project deals with time-series data, dynamic optimization techniques may be used to adapt the model to changes in the underlying data distribution over time.
 
-#### Conclusion
+#### <span style="color: purple;">Conclusion</span>
+---
 
 Optimizing the model is as crucial as building it. The optimization strategies are designed to improve the model's performance without overfitting, thereby ensuring that the model is both robust and adaptable.
 
-### <a name="limitations-and-challenges"></a>3.3.5 Limitations and Challenges
+### <span style="color: blue;"><a name="limitations-and-challenges"></a>3.3.5 Limitations and Challenges</span>
+---
 
-#### Data Imbalance
+#### <span style="color: purple;">Data Imbalance</span>
+---
 
 The dataset may have imbalanced classes, which can bias the predictive model. Strategies such as oversampling the minority class or using different evaluation metrics were considered to address this issue.
 
-#### Feature Engineering
+#### <span style="color: purple;">Feature Engineering</span>
+---
 
 While feature engineering can add predictive power to the model, it comes with the risk of overfitting, especially when using complex polynomial features or domain-specific features that may not be generalizable.
 
-#### Scalability
+#### <span style="color: purple;">Scalability</span>
+---
 
 As the model incorporates more features and becomes more complex, computational costs rise, affecting the model's scalability. This is particularly challenging for real-time or near-real-time prediction scenarios.
 
-#### Hyperparameter Complexity
+#### <span style="color: purple;">Hyperparameter Complexity</span>
+---
 
 The presence of multiple hyperparameters increases the dimensionality of the optimization problem, making it computationally expensive and potentially leading to local minima.
 
-#### Ethical Concerns
+#### <span style="color: purple;">Ethical Concerns</span>
+---
 
 Given that the model aims to predict sensitive outcomes like suicide attempts, ethical considerations around data privacy and the responsible use of predictions are paramount.
 
-#### Conclusion
+#### <span style="color: purple;">Conclusion</span>
+---
 
 Understanding the limitations and challenges of the model is crucial for both its development and deployment. These issues also provide avenues for future research and improvement.
 
-### <a name="final-model-selection"></a>3.3.6 Final Model Selection
+### <span style="color: blue;"><a name="final-model-selection"></a>3.3.6 Final Model Selection</span>
+---
 
-#### Criteria for Selection
+#### <span style="color: purple;">Criteria for Selection</span>
+---
 
 The final model was selected based on a comprehensive set of criteria which include accuracy, F1-score, computational efficiency, and interpretability.
 
-#### Selected Model
+#### <span style="color: purple;">Selected Model</span>
+---
 
 The XGBoost Classifier was the final model selected due to its superior performance metrics and the ability to handle imbalanced classes effectively.
 
-#### Performance Metrics
+#### <span style="color: purple;">Performance Metrics</span>
+---
 
 The model yielded an accuracy of 95%, an F1-score of 0.92, and an AUC-ROC of 0.98, surpassing all other models during cross-validation.
 
-#### Rationale
+#### <span style="color: purple;">Rationale</span>
+---
 
 XGBoost not only delivered high performance but also offers scalability and handles missing data gracefully, which are crucial for our dataset.
 
-#### Conclusion
+#### <span style="color: purple;">Conclusion</span>
+---
 
 The final model selection was a result of rigorous testing and validation. It not only meets the project objectives but also stands robust against various challenges discussed in the previous sections.
 
 
 
-### <a name="model-deployment"></a>3.3.7 Model Deployment
+### <span style="color: blue;"><a name="model-deployment"></a>3.3.7 Model Deployment</span>
+---
 
 The model deployment stage is a critical juncture where the developed model transitions from a research and development setting into real-world applications. Given the life-critical nature of the model, which aims to predict the suicide attempt risk among recently discharged patients, the deployment process is meticulously planned and executed. The model is embedded within an ETL (Extract, Transform, Load) process that is scheduled for daily runs, thus ensuring that it is continuously updated with fresh data. The ETL process itself is a blend of SQL for data extraction, Python for transformation and analytics, and SAS for detailed reporting.
 
-#### <a name="preparing-the-model-for-deployment"></a>3.3.7.1 Preparing the Model for Deployment
+#### <span style="color: purple;"><a name="preparing-the-model-for-deployment"></a>3.3.7.1 Preparing the Model for Deployment</span>
+---
 
 Preparation for deployment involves several steps, each aimed at ensuring that the model performs optimally when integrated into the ETL workflow. 
 
@@ -377,7 +437,8 @@ Preparation for deployment involves several steps, each aimed at ensuring that t
 
 These steps make certain that the model is not just theoretically sound but also practically deployable, reliable, and efficient.
 
-#### <a name="deployment-strategy"></a>3.3.7.2 Deployment Strategy
+#### <span style="color: purple;"><a name="deployment-strategy"></a>3.3.7.2 Deployment Strategy</span>
+---
 
 The deployment strategy focuses on operationalizing the predictive model within an existing ETL architecture that includes SQL, Python, and SAS technologies, and is orchestrated through Control-M for daily batch runs. This strategy is designed to be robust, scalable, and maintainable, given the model's sensitive application in healthcare for suicide risk prediction. Below are the key components:
 
@@ -401,7 +462,8 @@ By adopting this multifaceted deployment strategy, we ensure that the model is n
 
 
 
-#### <a name="scalability"></a>3.3.7.3 Scalability
+#### <span style="color: purple;"><a name="scalability"></a>3.3.7.3 Scalability</span>
+---
 
 Scalability is a crucial aspect to consider, especially for a model that is integrated within a healthcare system where data volume and model complexity can increase over time. Here are the components that make our deployment strategy scalable:
 
@@ -428,7 +490,8 @@ Scalability is a crucial aspect to consider, especially for a model that is inte
 By incorporating these elements into our scalability strategy, we ensure that the model can adapt to future challenges and changes in the healthcare landscape.
 
 
-#### <a name="monitoring-and-maintenance"></a>3.3.7.4 Monitoring and Maintenance
+#### <span style="color: purple;"><a name="monitoring-and-maintenance"></a>3.3.7.4 Monitoring and Maintenance</span>
+---
 
 Monitoring and maintenance are essential for any production-grade model, especially one that predicts sensitive health-related outcomes. Here's how we will ensure that our model remains efficient and accurate:
 
@@ -459,7 +522,8 @@ Monitoring and maintenance are essential for any production-grade model, especia
 By integrating these monitoring and maintenance practices into our deployment strategy, we ensure the long-term reliability and accuracy of the predictive model.
 
 
-#### <a name="rollback-plan"></a>3.3.7.5 Rollback Plan
+#### <span style="color: purple;"><a name="rollback-plan"></a>3.3.7.5 Rollback Plan</span>
+---
 
 A well-defined rollback plan is crucial for any deployed system, particularly when it deals with sensitive healthcare data and predictions. The rollback plan includes:
 
@@ -486,7 +550,8 @@ A well-defined rollback plan is crucial for any deployed system, particularly wh
 By having a robust rollback plan, we aim to minimize risks and ensure that the model remains reliable, even in the face of unexpected challenges.
 
 
-#### <a name="deployment-conclusion"></a>3.3.7.6 Conclusion
+#### <span style="color: purple;"><a name="deployment-conclusion"></a>3.3.7.6 Conclusion</span>
+---
 
 The deployment phase is the culmination of all the prior development, testing, and optimization efforts. Several key elements are vital for a successful deployment:
 
@@ -509,13 +574,16 @@ The deployment phase is the culmination of all the prior development, testing, a
 By systematically addressing these elements, we ensure that the deployed model is not just scientifically rigorous but also practically robust, scalable, and maintainable, fulfilling its critical role in healthcare decision-making.
 
 
-## <a name="setting-the-significance-level"></a>3.4.3 Setting the Significance Level (\( \alpha \))
+## <span style="color: green;"><a name="setting-the-significance-level"></a>3.4.3 Setting the Significance Level (\( \alpha \))</span>
+---
 
-### Introduction
+### <span style="color: blue;">Introduction</span>
+---
 
 The significance level (\( \alpha \)) is a crucial parameter in hypothesis testing, including the Wald test. It serves as a threshold for determining statistical significance and thus plays an important role in feature selection and model evaluation.
 
-### Pros and Cons of Different \( \alpha \) Levels
+### <span style="color: blue;">Pros and Cons of Different \( \alpha \) Levels</span>
+---
 
 | \( \alpha \) Level | Pros                                               | Cons                                                |
 |--------------------|----------------------------------------------------|-----------------------------------------------------|
@@ -523,7 +591,8 @@ The significance level (\( \alpha \)) is a crucial parameter in hypothesis testi
 | 0.05               | Balanced approach to Type I and Type II errors     | May still include some irrelevant features          |
 | 0.10               | Reduces Type II errors                             | Increases Type I errors                             |
 
-### Explanation
+### <span style="color: blue;">Explanation</span>
+---
 
 - **\( \alpha = 0.01 \)**: Very strict. You're making it hard to reject the null hypothesis, so you're less likely to make a Type I error but more likely to make a Type II error.
   
@@ -531,106 +600,133 @@ The significance level (\( \alpha \)) is a crucial parameter in hypothesis testi
   
 - **\( \alpha = 0.10 \)**: More lenient. You're making it easier to reject the null hypothesis, increasing the risk of Type I errors but decreasing the risk of Type II errors.
 
-### For Your Goals
+### <span style="color: blue;">For Your Goals</span>
+---
 
 Given the focus on building the best predictive model, \( \alpha = 0.05 \) is often a reasonable default. However, it may be beneficial to experiment with different \( \alpha \) levels and evaluate their impact on the model's predictive performance.
 
 
 
-## <a name="results-and-discussion"></a>4. Results and Discussion
+## <span style="color: green;"><a name="results-and-discussion"></a>4. Results and Discussion</span>
+---
 
 This section presents the results obtained from the deployed predictive model and discusses their implications, both in terms of performance metrics and in the broader context of healthcare for predicting suicide attempts among discharged patients.
 
-### <a name="performance-evaluation"></a>4.1 Performance Evaluation
+### <span style="color: blue;"><a name="performance-evaluation"></a>4.1 Performance Evaluation</span>
+---
 
-#### Model Metrics
+#### <span style="color: purple;">Model Metrics</span>
+---
 
 Key performance metrics such as accuracy, precision, recall, and F1-score will be evaluated to gauge the model's efficacy. In addition, the Area Under the Receiver Operating Characteristic curve (AUC-ROC) will be calculated to assess the model's capability to distinguish between high-risk and low-risk cases.
 
-#### Comparative Analysis
+#### <span style="color: purple;">Comparative Analysis</span>
+---
 
 The model's performance will be compared against baseline methods and previous works in this domain, providing a comprehensive understanding of its relative strengths and weaknesses.
 
-### <a name="implications-and-insights"></a>4.2 Implications and Insights
+### <span style="color: blue;"><a name="implications-and-insights"></a>4.2 Implications and Insights</span>
+---
 
-#### Clinical Relevance
+#### <span style="color: purple;">Clinical Relevance</span>
+---
 
 The model's results will be analyzed in the context of clinical practice. Specifically, the model's ability to correctly identify high-risk patients can have significant implications for targeted interventions.
 
-#### Ethical Considerations
+#### <span style="color: purple;">Ethical Considerations</span>
+---
 
 Given the sensitive nature of the data and the model's application, ethical considerations such as data privacy and informed consent will be discussed.
 
-### <a name="limitations"></a>4.3 Limitations
+### <span style="color: blue;"><a name="limitations"></a>4.3 Limitations</span>
+---
 
 Potential limitations of the study, including data quality and model assumptions, will be discussed to provide a balanced view of the results.
 
-### <a name="future-work"></a>4.4 Future Work
+### <span style="color: blue;"><a name="future-work"></a>4.4 Future Work</span>
+---
 
 Suggestions for future research directions, including possible improvements to the model and the evaluation framework, will be outlined.
 
-## <a name="conclusion-and-recommendations"></a>5. Conclusion and Recommendations
+## <span style="color: green;"><a name="conclusion-and-recommendations"></a>5. Conclusion and Recommendations</span>
+---
 
 This section encapsulates the main findings of the study and provides actionable recommendations for both immediate implementation and future research.
 
-### <a name="summary-of-findings"></a>5.1 Summary of Findings
+### <span style="color: blue;"><a name="summary-of-findings"></a>5.1 Summary of Findings</span>
+---
 
-#### Model Performance
+#### <span style="color: purple;">Model Performance</span>
+---
 
 The predictive model demonstrated robust performance metrics, making it a viable tool for identifying high-risk patients for suicide attempts post-discharge.
 
-#### Clinical Utility
+#### <span style="color: purple;">Clinical Utility</span>
+---
 
 The model's application within the healthcare setting has shown promise in enhancing targeted interventions and patient care.
 
-#### Operational Efficiency
+#### <span style="color: purple;">Operational Efficiency</span>
+---
 
 The ETL process, combined with the Control-M scheduling, has ensured the model's seamless integration into existing healthcare systems, making it both scalable and maintainable.
 
-### <a name="future-work"></a>5.2 Future Work
+### <span style="color: blue;"><a name="future-work"></a>5.2 Future Work</span>
+---
 
-#### Model Refinement
+#### <span style="color: purple;">Model Refinement</span>
+---
 
 Ongoing data collection will provide opportunities for model refinement, including parameter tuning and feature engineering.
 
-#### Expand Scope
+#### <span style="color: purple;">Expand Scope</span>
+---
 
 There's potential to expand the model's application to other areas within healthcare, subject to additional data and validation.
 
-#### Regulatory Approvals
+#### <span style="color: purple;">Regulatory Approvals</span>
+---
 
 Efforts should be directed towards obtaining necessary regulatory approvals for wider clinical deployment.
 
-## <a name="references"></a>6. References
+## <span style="color: green;"><a name="references"></a>6. References</span>
+---
 
 1. Smith, J. et al. (2020). Machine Learning Models for Healthcare: A Review. *Journal of Healthcare Informatics*, 12(3), 45-60.
 2. Johnson, A. et al. (2019). Addressing Zero-Inflation in Medical Data: A Case Study. *Medical Data Analysis*, 7(2), 21-33.
 3. Kumar, S. et al. (2021). Scalable ETL Processes for Healthcare: An Implementation Guide. *Healthcare Systems Engineering*, 8(1), 11-29.
 4. Lee, K. et al. (2018). Predictive Modeling in Mental Health: Applications and Challenges. *Journal of Mental Health*, 5(4), 56-64.
 
-## <a name="appendices"></a>7. Appendices
+## <span style="color: green;"><a name="appendices"></a>7. Appendices</span>
+---
 
-### <a name="code-implementation"></a>7.1 Code Implementation
+### <span style="color: blue;"><a name="code-implementation"></a>7.1 Code Implementation</span>
+---
 
 The complete codebase, including all data preprocessing steps, model training and evaluation scripts, and deployment scripts, is available in the project repository. A simplified version of key functionalities is also included for quick reference.
 
-#### Sample Code Snippets
+#### <span style="color: purple;">Sample Code Snippets</span>
+---
 
 ```python
-# Data Preprocessing
+# <span style="color: red;">Data Preprocessing</span>
+---
 from preprocessing import preprocess_data
 preprocessed_data = preprocess_data(raw_data)
 
-# Model Training
+# <span style="color: red;">Model Training</span>
+---
 from model import train_model
 trained_model = train_model(preprocessed_data)
 
-# Deployment
+# <span style="color: red;">Deployment</span>
+---
 from deploy import deploy_model
 deploy_model(trained_model)
 ```
 
-### <a name="additional-visualizations-and-tables"></a>7.2 Additional Visualizations and Tables
+### <span style="color: blue;"><a name="additional-visualizations-and-tables"></a>7.2 Additional Visualizations and Tables</span>
+---
 
 Additional visualizations and tables that provide more insights into the data and the performance of the model are included in this section. For instance:
 
