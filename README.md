@@ -1,47 +1,25 @@
-import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
-from sklearn.metrics import confusion_matrix, precision_recall_curve, calibration_curve, roc_curve, auc
+# Calibrating Deep Learning Model Probabilities with the Beta Distribution
 
-# Assuming y_true is your true labels and y_probs is the predicted probabilities for the positive class
-y_true = np.array([...])  # Replace with your actual data
-y_probs = np.array([...])  # Replace with your actual data
-y_pred = (y_probs > 0.5).astype(int)
+In the field of machine learning, particularly deep learning, model calibration is crucial for generating reliable probability scores. Calibration becomes imperative when the model's predictions are to be interpreted and utilized in real-world decision-making processes.
 
-# 1. Confusion Matrix
-plt.figure(figsize=(8, 6))
-sns.heatmap(confusion_matrix(y_true, y_pred), annot=True, cmap='Blues', fmt='g')
-plt.xlabel('Predicted labels')
-plt.ylabel('True labels')
-plt.title('Confusion Matrix')
-plt.show()
+Deep Learning models, especially those tasked with binary classification, generate output in the form of probability scores. These scores, at face value, represent the model's confidence regarding the assignment of an instance to a specific class. However, it's a well-documented challenge that these probability scores might not always mirror the true likelihood of events.
 
-# 2. Precision-Recall Curve
-precision, recall, _ = precision_recall_curve(y_true, y_probs)
-plt.figure(figsize=(8, 6))
-plt.plot(recall, precision, color='blue', lw=2)
-plt.xlabel('Recall')
-plt.ylabel('Precision')
-plt.title('Precision-Recall Curve')
-plt.show()
+**Model Calibration** seeks to rectify this. A calibrated model will, for all instances where it predicts a probability of $p$, ensure that the actual fraction of correct predictions is close to $p$. This forms the bedrock of interpretability and trust in model predictions.
 
-# 3. Calibration Curve (Reliability Plot)
-prob_true, prob_pred = calibration_curve(y_true, y_probs, n_bins=10)
-plt.figure(figsize=(8, 6))
-plt.plot(prob_pred, prob_true, marker='.', color='blue')
-plt.plot([0, 1], [0, 1], ls='--', color='gray')
-plt.xlabel('Mean Predicted Probability')
-plt.ylabel('Fraction of Positives')
-plt.title('Calibration Curve')
-plt.show()
+A proficient approach to achieve this calibration is by leveraging the **Beta Distribution**. The Beta distribution, defined by its two parameters $\alpha$ and $\beta$, can be utilized to model the distribution of probabilities output by the model. By equating the model's output to a random sample from a Beta distribution, we can infer the values of $\alpha$ and $\beta$ that best fit the observed data.
 
-# 4. ROC Curve
-fpr, tpr, _ = roc_curve(y_true, y_probs)
-roc_auc = auc(fpr, tpr)
-plt.figure(figsize=(8, 6))
-plt.plot(fpr, tpr, color='blue', lw=2, label=f'ROC curve (area = {roc_auc:.2f})')
-plt.xlabel('False Positive Rate')
-plt.ylabel('True Positive Rate')
-plt.title('ROC Curve')
-plt.legend(loc="lower right")
-plt.show()
+Mathematically, given a set of predicted probabilities $p$ and the true binary labels, the likelihood function in terms of $\alpha$ and $\beta$ is:
+
+$$
+L(\alpha, \beta | p) = \prod_{i=1}^{n} p_i^{\alpha-1}(1-p_i)^{\beta-1}
+$$
+
+Where $n$ is the total number of instances.
+
+Maximizing this likelihood function gives us the values of $\alpha$ and $\beta$ that best calibrate our model's predictions. Once calibrated, the model's predictions become more reflective of the true underlying probabilities.
+
+In the subsequent visual representation, the original model probabilities and the calibrated probabilities will be contrasted. Key reference points, labeled as (A), (B), and (C), will be highlighted:
+
+- (A) represents the distribution of original model probabilities.
+- (B) showcases the distribution of calibrated probabilities.
+- (C) will pinpoint instances where the calibration significantly altered the probability, underscoring the importance and impact of this process.
